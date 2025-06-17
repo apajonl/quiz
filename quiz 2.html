@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Woord Quiz Spel</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .question { font-size: 1.5em; margin-bottom: 20px; }
+    .options button { display: block; margin: 5px 0; width: 100%; }
+    #feedback { margin: 10px 0; font-weight: bold; }
+    #next { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Woord Quiz Spel</h1>
+  <div>
+    <button onclick="startGame('en-nl')">Engels → Nederlands</button>
+    <button onclick="startGame('nl-en')">Nederlands → Engels</button>
+    <button onclick="startGame('mixed')">Gemengd</button>
+  </div>
+  <div id="game" style="display:none;">
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
+    <div id="feedback"></div>
+    <button id="next" onclick="nextQuestion()">Volgende</button>
+  </div>
+
+  <script>
+    const words = [
+      { en: "a stomach ache", nl: "buikpijn" },
+      { en: "a headache", nl: "hoofdpijn" },
+      { en: "accident", nl: "ongeluk" },
+      { en: "ankle", nl: "enkel" },
+      { en: "bad", nl: "slecht" },
+      { en: "bandage", nl: "verband" },
+      { en: "bite wounds", nl: "bijtwonden" },
+      { en: "chest", nl: "borst" },
+      { en: "chickenpox", nl: "waterpokken" },
+      { en: "dentist", nl: "tandarts" },
+      { en: "disease", nl: "ziekte" },
+      { en: "fever", nl: "koorts" },
+      { en: "five-car collision", nl: "kettingbotsing met vijf auto’s" },
+      { en: "flu", nl: "griep" },
+      { en: "medicine", nl: "medicijn" },
+      { en: "mumps", nl: "de bof" },
+      { en: "operation", nl: "operatie" },
+      { en: "plaster cast", nl: "gips" },
+      { en: "shoulder", nl: "schouder" },
+      { en: "skeleton", nl: "skelet" },
+      { en: "spots", nl: "vlekken" },
+      { en: "temperature", nl: "temperatuur" },
+      { en: "the sore spot", nl: "de zere plek" },
+      { en: "tired", nl: "moe" },
+      { en: "to blow your nose", nl: "je neus snuiten" },
+      { en: "to break a bone", nl: "een bot breken" },
+      { en: "to breathe", nl: "ademen" },
+      { en: "to cough", nl: "hoesten" },
+      { en: "healthy", nl: "gezond" },
+      { en: "heart", nl: "hart" },
+      { en: "hospital", nl: "ziekenhuis" },
+      { en: "illness", nl: "ziekte" },
+      { en: "injured", nl: "gewond" },
+      { en: "lungs", nl: "longen" },
+      { en: "to feel sick", nl: "niet lekker voelen" },
+      { en: "to have a cold", nl: "verkouden zijn" },
+      { en: "to hurt", nl: "pijn doen" },
+      { en: "twisted", nl: "verdraaid" },
+      { en: "victim", nl: "slachtoffer" }
+    ];
+
+    let currentMode = '';
+    let currentWord = {};
+
+    function startGame(mode) {
+      currentMode = mode;
+      document.getElementById('game').style.display = 'block';
+      nextQuestion();
+    }
+
+    function nextQuestion() {
+      document.getElementById('feedback').textContent = '';
+      document.getElementById('next').style.display = 'none';
+
+      currentWord = words[Math.floor(Math.random() * words.length)];
+      const isMixed = currentMode === 'mixed';
+      const askEn = currentMode === 'en-nl' || (isMixed && Math.random() < 0.5);
+
+      const questionText = askEn ? currentWord.en : currentWord.nl;
+      const correctAnswer = askEn ? currentWord.nl : currentWord.en;
+      document.getElementById('question').textContent = questionText;
+
+      const options = new Set([correctAnswer]);
+      while (options.size < 4) {
+        const rand = words[Math.floor(Math.random() * words.length)];
+        options.add(askEn ? rand.nl : rand.en);
+      }
+
+      const shuffledOptions = Array.from(options).sort(() => Math.random() - 0.5);
+      const optionsDiv = document.getElementById('options');
+      optionsDiv.innerHTML = '';
+
+      shuffledOptions.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.textContent = opt;
+        btn.onclick = () => {
+          if (opt === correctAnswer) {
+            document.getElementById('feedback').textContent = 'Goed gedaan!';
+          } else {
+            document.getElementById('feedback').textContent = `Fout. Het juiste antwoord is: ${correctAnswer}`;
+          }
+          document.getElementById('next').style.display = 'block';
+          document.getElementById('next').focus();
+        };
+        optionsDiv.appendChild(btn);
+      });
+    }
+  </script>
+</body>
+</html>
