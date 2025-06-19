@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <title>Spreekwoorden Quiz</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+    button, label { margin: 5px; padding: 10px 20px; font-size: 16px; }
+    #quiz, #einde { margin-top: 30px; }
+    .options button { display: block; margin: 10px auto; width: 80%; }
+  </style>
+</head>
+<body>
+
+  <h1>Spreekwoorden Quiz</h1>
+
+  <p>Kies speltype:</p>
+  <label><input type="radio" name="speltype" value="spreekwoord" checked> Spreekwoord ➜ Betekenis</label><br>
+  <label><input type="radio" name="speltype" value="betekenis"> Betekenis ➜ Spreekwoord</label><br><br>
+
+  <p>Kies een reeks:</p>
+  <button onclick="startGame(0,10)">1–10</button>
+  <button onclick="startGame(10,20)">11–20</button>
+  <button onclick="startGame(20,30)">21–30</button>
+  <button onclick="startGame(30,40)">31–40</button>
+  <button onclick="startGame(40,50)">41–50</button>
+  <button onclick="startGame(0,50,true)">Alle 50 (random)</button>
+
+  <div id="quiz" style="display:none;">
+    <p id="vraag"></p>
+    <div class="options">
+      <button id="optie1" onclick="checkAntwoord(this)"></button>
+      <button id="optie2" onclick="checkAntwoord(this)"></button>
+      <button id="optie3" onclick="checkAntwoord(this)"></button>
+      <button id="optie4" onclick="checkAntwoord(this)"></button>
+    </div>
+    <p id="score"></p>
+  </div>
+
+  <div id="einde" style="display:none;">
+    <h2>Je bent klaar!</h2>
+    <p id="eindscore"></p>
+    <button onclick="location.reload()">Opnieuw Spelen</button>
+  </div>
+
+<script>
+const spreekwoorden = [
+  { tekst: "De aap komt uit de mouw", betekenis: "De waarheid wordt duidelijk." },
+  { tekst: "Wie het kleine niet eert, is het grote niet weerd", betekenis: "Waardeer ook de kleine dingen." },
+  { tekst: "Door de mand vallen", betekenis: "Betrapt worden of ontmaskerd worden." },
+  { tekst: "Oost west, thuis best", betekenis: "Thuis is de fijnste plek." },
+  { tekst: "Zoals de ouden zongen, piepen de jongen", betekenis: "Kinderen nemen het gedrag van hun ouders over." },
+  { tekst: "Een kat in de zak kopen", betekenis: "Iets kopen dat tegenvalt." },
+  { tekst: "Beter één vogel in de hand dan tien in de lucht", betekenis: "Wees tevreden met wat je hebt." },
+  { tekst: "Na regen komt zonneschijn", betekenis: "Na moeilijke tijden komen betere tijden." },
+  { tekst: "De pot verwijt de ketel dat hij zwart ziet", betekenis: "Iemand bekritiseren om iets waar je zelf ook schuldig aan bent." },
+  { tekst: "Waar rook is, is vuur", betekenis: "Geruchten hebben vaak een kern van waarheid." },
+  { tekst: "Als twee honden vechten om een been, loopt de derde ermee heen", betekenis: "Een buitenstaander profiteert van een ruzie tussen twee anderen." },
+  { tekst: "Het gras is altijd groener aan de overkant", betekenis: "Andermans situatie lijkt altijd beter." },
+  { tekst: "Wie wind zaait, zal storm oogsten", betekenis: "Wie onrust veroorzaakt, krijgt problemen terug." },
+  { tekst: "Een ezel stoot zich geen twee keer aan dezelfde steen", betekenis: "Je zou niet twee keer dezelfde fout moeten maken." },
+  { tekst: "De koe bij de horens vatten", betekenis: "Een probleem direct aanpakken." },
+  { tekst: "Iets uit de duim zuigen", betekenis: "Iets verzinnen dat niet waar is." },
+  { tekst: "Met de deur in huis vallen", betekenis: "Meteen ter zake komen." },
+  { tekst: "Door de bomen het bos niet meer zien", betekenis: "Het overzicht verliezen." },
+  { tekst: "Zo gezegd, zo gedaan", betekenis: "Iets meteen uitvoeren nadat het gezegd is." },
+  { tekst: "Water bij de wijn doen", betekenis: "Een compromis sluiten." },
+  { tekst: "Over koetjes en kalfjes praten", betekenis: "Over onbelangrijke dingen praten." },
+  { tekst: "Iets onder de knie hebben", betekenis: "Iets goed beheersen." },
+  { tekst: "Ergens de stekker uittrekken", betekenis: "Iets beëindigen." },
+  { tekst: "Van een mug een olifant maken", betekenis: "Overdrijven." },
+  { tekst: "Voor een dubbeltje op de eerste rij willen zitten", betekenis: "Alles willen, maar niets willen betalen." },
+  { tekst: "Een storm in een glas water", betekenis: "Veel ophef om niets." },
+  { tekst: "Tegen de lamp lopen", betekenis: "Betrapt worden." },
+  { tekst: "De kat uit de boom kijken", betekenis: "Afwachten en kijken wat er gebeurt." },
+  { tekst: "Het roer omgooien", betekenis: "Een heel andere koers kiezen." },
+  { tekst: "Door dik en dun steunen", betekenis: "Altijd iemand blijven steunen." },
+  { tekst: "Wie niet waagt, die niet wint", betekenis: "Zonder proberen kun je niet winnen." },
+  { tekst: "Hij heeft het hart op de tong", betekenis: "Hij zegt direct wat hij denkt." },
+  { tekst: "Door de vingers zien", betekenis: "Iets toestaan of niet bestraffen." },
+  { tekst: "Het is geen kattenpis", betekenis: "Het is serieus of belangrijk." },
+  { tekst: "Je moet geen slapende honden wakker maken", betekenis: "Geen problemen veroorzaken als dat niet nodig is." },
+  { tekst: "Met iemand een appeltje te schillen hebben", betekenis: "Nog een rekening te vereffenen hebben." },
+  { tekst: "Op alle slakken zout leggen", betekenis: "Over alles zeuren." },
+  { tekst: "Van de hak op de tak springen", betekenis: "Steeds van onderwerp veranderen." },
+  { tekst: "Iets op je kerfstok hebben", betekenis: "Iets misdaan hebben." },
+  { tekst: "Wie A zegt, moet ook B zeggen", betekenis: "Als je ergens aan begint, moet je het ook afmaken." },
+  { tekst: "Op het verkeerde been zetten", betekenis: "Iemand misleiden." },
+  { tekst: "Dat is een brug te ver", betekenis: "Dat is te moeilijk of onhaalbaar." },
+  { tekst: "Voor iemand door het vuur gaan", betekenis: "Alles voor iemand over hebben." },
+  { tekst: "Een rib uit mijn lijf", betekenis: "Het kost erg veel (geld of moeite)." },
+  { tekst: "Zich uit de voeten maken", betekenis: "Snel vertrekken." },
+  { tekst: "Boter bij de vis", betekenis: "Meteen betalen bij levering." },
+  { tekst: "Dat is niet in de haak", betekenis: "Dat klopt niet." },
+  { tekst: "Met man en macht", betekenis: "Met alle beschikbare krachten." },
+  { tekst: "Wie zijn billen brandt, moet op de blaren zitten", betekenis: "Wie een fout maakt, moet de gevolgen dragen." }
+];
+
+let gekozenLijst = [], huidigeVraag = 0, score = 0, speltype = 'spreekwoord';
+
+function startGame(startIndex, endIndex, isRandom = false) {
+  const radios = document.getElementsByName("speltype");
+  radios.forEach(r => { if (r.checked) speltype = r.value; });
+
+  gekozenLijst = spreekwoorden.slice(startIndex, endIndex);
+  if (isRandom) gekozenLijst.sort(() => Math.random() - 0.5);
+  huidigeVraag = 0;
+  score = 0;
+  document.getElementById('quiz').style.display = 'block';
+  document.getElementById('einde').style.display = 'none';
+  volgendeVraag();
+}
+
+function volgendeVraag() {
+  if (huidigeVraag >= gekozenLijst.length) {
+    document.getElementById('quiz').style.display = 'none';
+    document.getElementById('einde').style.display = 'block';
+    document.getElementById('eindscore').innerText = `Je had ${score} van de ${gekozenLijst.length} goed.`;
+    return;
+  }
+
+  const vraag = gekozenLijst[huidigeVraag];
+  const juist = speltype === 'spreekwoord' ? vraag.betekenis : vraag.tekst;
+
+  let fouteOpties = [];
+  while (fouteOpties.length < 3) {
+    const willekeurig = spreekwoorden[Math.floor(Math.random() * spreekwoorden.length)];
+    const fout = speltype === 'spreekwoord' ? willekeurig.betekenis : willekeurig.tekst;
+    if (fout !== juist && !fouteOpties.includes(fout)) {
+      fouteOpties.push(fout);
+    }
+  }
+
+  const opties = [juist, ...fouteOpties].sort(() => Math.random() - 0.5);
+
+  document.getElementById('vraag').innerText =
+    speltype === 'spreekwoord' ? `Wat betekent: "${vraag.tekst}"` : `Welk spreekwoord past bij: "${vraag.betekenis}"`;
+
+  for (let i = 0; i < 4; i++) {
+    const knop = document.getElementById(`optie${i + 1}`);
+    knop.innerText = opties[i];
+    knop.dataset.correct = opties[i] === juist;
+  }
+
+  document.getElementById('score').innerText = `Vraag ${huidigeVraag + 1} van ${gekozenLijst.length} | Goed: ${score}`;
+}
+
+function checkAntwoord(button) {
+  const juist = button.dataset.correct === "true";
+  const correcteAntwoord = speltype === 'spreekwoord'
+    ? gekozenLijst[huidigeVraag].betekenis
+    : gekozenLijst[huidigeVraag].tekst;
+
+  if (juist) {
+    alert("✅ Goed!");
+    score++;
+  } else {
+    alert(`❌ Fout! Het juiste antwoord was:\n"${correcteAntwoord}"`);
+  }
+
+  huidigeVraag++;
+  volgendeVraag();
+}
+</script>
+
+</body>
+</html>
