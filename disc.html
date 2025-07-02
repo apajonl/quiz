@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <title>Kleur Eigenschap Spel</title>
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      padding: 20px;
+    }
+    .kleurknop {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 18px;
+      border: none;
+      cursor: pointer;
+      color: white;
+    }
+    .rood { background-color: #e60000; }
+    .geel { background-color: #ffcc00; color: black; }
+    .groen { background-color: #009933; }
+    .blauw { background-color: #0073e6; }
+    #feedback {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    #eigenschap {
+      font-size: 24px;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Eigenschappen Kleurenspel</h1>
+
+  <div>
+    <h3>Kies minimaal 2 kleuren om te oefenen:</h3>
+    <label><input type="checkbox" id="roodCheck"> Rood</label>
+    <label><input type="checkbox" id="geelCheck"> Geel</label>
+    <label><input type="checkbox" id="groenCheck"> Groen</label>
+    <label><input type="checkbox" id="blauwCheck"> Blauw</label>
+    <br><br>
+    <button onclick="startSpel()">Start Spel</button>
+  </div>
+
+  <div id="spel" style="display:none;">
+    <div id="eigenschap"></div>
+    <button class="kleurknop rood" onclick="checkAntwoord('rood')">Rood</button>
+    <button class="kleurknop geel" onclick="checkAntwoord('geel')">Geel</button>
+    <button class="kleurknop groen" onclick="checkAntwoord('groen')">Groen</button>
+    <button class="kleurknop blauw" onclick="checkAntwoord('blauw')">Blauw</button>
+    <div id="feedback"></div>
+  </div>
+
+  <script>
+    const eigenschappen = {
+      rood: ["Drijvend", "Ambitieus", "Wilskrachtig", "Doelbewust", "Probleemoplossend", "Daadkrachtig", "Competitief", "Krachtig", "Nieuwsgierig", "Direct", "Initiatiefrijk", "Vastberaden", "Ongeduldig", "Eigenzinnig"],
+      geel: ["Extravert", "Overtuigend", "Verbaal", "Open", "Positief", "Empathisch", "Optimistisch", "Creatief", "Spontaan", "Gevoelig", "Inspirerend", "Heeft aandacht nodig"],
+      groen: ["Geduldig", "Betrouwbaar", "Attent", "Beheerst", "Amiabel", "Volhardend", "Goede luisteraar", "Vriendelijk", "Voorzichtig", "Ondersteunend", "Uitvoerder", "Behulpzaam", "Loyaal", "Voorkomend"],
+      blauw: ["Onderzoekend", "Voorzichtig", "Systematisch", "Precies", "Grondig", "Logisch", "Conventioneel", "Afstandelijk", "Objectief", "Perfectionist", "Methodisch", "Analyseert", "Volgt regels", "Gestructureerd"]
+    };
+
+    let gekozenKleuren = [];
+    let huidigeEigenschap = "";
+    let juisteKleur = "";
+
+    function startSpel() {
+      gekozenKleuren = [];
+      if (document.getElementById("roodCheck").checked) gekozenKleuren.push("rood");
+      if (document.getElementById("geelCheck").checked) gekozenKleuren.push("geel");
+      if (document.getElementById("groenCheck").checked) gekozenKleuren.push("groen");
+      if (document.getElementById("blauwCheck").checked) gekozenKleuren.push("blauw");
+
+      if (gekozenKleuren.length < 2) {
+        alert("Kies minimaal twee kleuren om te starten.");
+        return;
+      }
+
+      document.getElementById("spel").style.display = "block";
+      document.getElementById("feedback").innerText = "";
+      toonNieuweEigenschap();
+    }
+
+    function toonNieuweEigenschap() {
+      const randomKleur = gekozenKleuren[Math.floor(Math.random() * gekozenKleuren.length)];
+      const eigenschapLijst = eigenschappen[randomKleur];
+      const eigenschap = eigenschapLijst[Math.floor(Math.random() * eigenschapLijst.length)];
+      huidigeEigenschap = eigenschap;
+      juisteKleur = randomKleur;
+      document.getElementById("eigenschap").innerText = `Welke kleur hoort bij: "${eigenschap}"?`;
+      document.getElementById("feedback").innerText = "";
+    }
+
+    function checkAntwoord(gekozenKleur) {
+      if (gekozenKleur === juisteKleur) {
+        document.getElementById("feedback").innerText = "✅ Goed!";
+        document.getElementById("feedback").style.color = "green";
+      } else {
+        document.getElementById("feedback").innerText = `❌ Fout! Het juiste antwoord is: ${juisteKleur.toUpperCase()}`;
+        document.getElementById("feedback").style.color = "red";
+      }
+      setTimeout(toonNieuweEigenschap, 1500);
+    }
+  </script>
+
+</body>
+</html>
